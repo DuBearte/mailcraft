@@ -267,7 +267,9 @@ pub(crate) fn open_dialog(app: &mut MailApp, name: &str, params: &Value) -> Opti
 pub fn confirmation(app: &MailApp, id: &str, params: &Value) -> Option<Question> {
     let mb = &app.session.mailbox;
     let folder = |key: &str| params.get(key).and_then(Value::as_u64).or(Some(app.session.view.folder)).and_then(|f| mb.folder(f));
-    let on_server = |account: u64| mb.account(account).is_some_and(|a| a.kind.has_server());
+    // (Not a JMAP account's yet: nothing done here goes up to its server until the engine sends its
+    // changes, so nothing is removed there.)
+    let on_server = |account: u64| mb.account(account).is_some_and(|a| a.kind.has_server() && a.kind != mailcraft_model::AccountKind::Jmap);
     let server_too = |yes: bool| if yes { format!(" {}", tl!("They are removed from the mail server too.")) } else { String::new() };
     let question = |title: &str, text: String, action: &str| Some(Question::new(title, text, action, Value::Null));
     match id {
@@ -890,8 +892,12 @@ pub(crate) fn buttons(ui: &mut Ui, ok_label: &str, ok_enabled: bool) -> (bool, b
 
 pub fn show(app: &mut MailApp, ctx: &egui::Context) {
     let Some(mut dialog) = app.dialog.take() else { return };
-    let escape = ctx.input(|i| i.key_pressed(Key::Escape));
-    let enter = ctx.input(|i| i.key_pressed(Key::Enter));
+    // A held key is one press (#393): its repeats don't close the dialog or press OK. They may be
+    // left from a key that closed what was over the dialog. Escape's repeats are taken here, so
+    // nothing later gets them. Enter's are left, since a box of several lines in a dialog needs
+    // them for new lines.
+    let escape = ctx.input_mut(|i| crate::keys::take_once(i, Key::Escape));
+    let enter = ctx.input(|i| crate::keys::pressed_once(i, Key::Enter));
     let t = Tokens::get(ctx);
     // A scrim: what is behind the dialog is out of reach until it is answered.
     let screen = ctx.content_rect();

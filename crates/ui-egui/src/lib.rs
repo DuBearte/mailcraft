@@ -66,6 +66,8 @@ pub mod mail_view;
 mod meeting_dialogs;
 pub mod menubar;
 pub mod nav;
+#[cfg(test)]
+mod on_top_tests;
 mod open_shared;
 #[cfg(test)]
 mod open_shared_tests;
@@ -2331,8 +2333,8 @@ impl MailApp {
     }
 
     fn server_accounts(&self) -> Vec<Id> {
-        // (Not a JMAP account yet: no run of one is made until the engine has its commands, and
-        // every run would end in a refusal.)
+        // (Not a JMAP account yet: the window has no runner for one, so every run of it would end
+        // in a refusal.)
         let runs = |a: &&mailcraft_model::Account| a.kind.has_server() && a.kind != mailcraft_model::AccountKind::Jmap;
         self.session.mailbox.accounts.iter().filter(runs).map(|a| a.id).collect()
     }
@@ -3582,6 +3584,8 @@ impl MailApp {
         // mailbox's times are put by the new clock before anything of it is drawn, and so are
         // the appointments that stand open.
         self.follow_zone();
+        // The agent's question is on top of everything, so it gets Enter and Escape first.
+        agent_gate::keys(self, &ctx);
         // Windows of their own (a message, an appointment), before the shortcuts: Escape closes
         // the one in front where they are inside this window.
         windows::show(self, &ctx);
@@ -3824,6 +3828,11 @@ fn feedback(id: &str, v: &Value) -> Option<String> {
         }
         "compose.send" => Some(tl!("Sent").to_string()),
         "compose.saveDraft" => Some(tl!("Draft saved").to_string()),
+        // A draft its JMAP account's server has isn't deleted yet (M6): the editor closes, and why
+        // the draft is still in Drafts is said, as the Move menu says it.
+        "compose.discard" => {
+            v.get("stays").and_then(Value::as_str).map(|why| i18n::fmt(tl!("The draft stays in Drafts. {why}"), &[("why", tl!(why))]))
+        }
         "mail.markAllRead" | "rules.run" => n("changed").or(n("matched")).map(|c| tln!(c, "{n} message changed", "{n} messages changed")),
         "file.import" => {
             let mut parts = Vec::new();
