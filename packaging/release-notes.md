@@ -13,6 +13,7 @@
 
 **Fixes**
 - One press of Escape or Enter no longer does two things at once. With an agent's question on screen, it only answers the question (before, it could also close the message you were writing, a dialog, File or Send/Receive Progress). With a menu open, Escape only closes the menu; with a dialog open in File, only the dialog. Holding a key down counts as one press there, and a key you were already holding when an agent's question appears doesn't answer it ([#393](https://github.com/GITHUB_REPOSITORY/issues/393), thanks to @kartas39).
+- In People, a click outside the search box keeps what you typed in it, so the box always shows the search that filters the list ([#366](https://github.com/GITHUB_REPOSITORY/issues/366)).
 - Signing in with a password now works with mail servers that turn away the older LOGIN command: MailCraft uses the server's PLAIN sign-in when it offers one ([#375](https://github.com/GITHUB_REPOSITORY/issues/375)).
 - Escape in the search box clears the search and no longer closes a message you are writing ([#365](https://github.com/GITHUB_REPOSITORY/issues/365), thanks to @kartas39).
 - In Calendar, an appointment can be moved between your calendar and a shared mailbox's, or one you opened by address, where you may edit both: it is made in the other calendar first and taken out of the old one only once the copy is there. A meeting is not moved to another mailbox's calendar (it would send everyone invited a cancellation); forward it or create it again there ([#70](https://github.com/GITHUB_REPOSITORY/issues/70)).

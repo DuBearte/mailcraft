@@ -79,3 +79,27 @@ fn a_held_escape_is_one_press() {
     assert!(h.state().dialog.is_none());
     assert!(writing(&h), "the dialog had it");
 }
+
+/// In People, a click outside the box keeps the letters in it with the contacts they found, and
+/// Escape shows every contact again with the box empty (#366).
+#[test]
+fn people_keeps_what_the_box_shows() {
+    let mut h = testing::window("view.people");
+    let _ = h.state_mut().execute("ui.dismissReminder", json!({"all": true}));
+    // A click in the box (`ui.focusSearch` is the shortcut, which goes to Mail).
+    h.state_mut().search_focus = true;
+    h.run_steps(4);
+    testing::text(&mut h, "lumen");
+    assert_eq!(h.state().session.view.people_search, "lumen");
+    testing::click(&mut h, egui::pos2(640.0, 790.0), egui::PointerButton::Primary, 1);
+    h.run_steps(4);
+    assert_eq!(h.state().search_text, "lumen", "the box keeps its letters");
+    assert_eq!(h.state().session.view.people_search, "lumen");
+    // A click in the box (`ui.focusSearch` is the shortcut, which goes to Mail).
+    h.state_mut().search_focus = true;
+    h.run_steps(4);
+    testing::key(&mut h, Key::Escape);
+    h.run_steps(4);
+    assert_eq!(h.state().session.view.people_search, "");
+    assert_eq!(h.state().search_text, "");
+}

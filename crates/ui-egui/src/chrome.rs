@@ -96,8 +96,10 @@ fn search_box(app: &mut MailApp, ui: &mut Ui, rect: Rect) {
     );
     icons::paint(ui.painter(), Rect::from_center_size(pos2(rect.min.x + 15.0, rect.center().y), vec2(16.0, 16.0)), "search", t.text_dim, t.accent);
     // The engine's search is the truth; the box follows it when it changes elsewhere (a command).
-    if !focused && app.search_text != app.session.view.search {
-        app.search_text = app.session.view.search.clone();
+    // People has a search of its own (#366).
+    let truth = if app.session.view.module == Module::People { &app.session.view.people_search } else { &app.session.view.search };
+    if !focused && app.search_text != *truth {
+        app.search_text = truth.clone();
     }
     // A dialog over the window takes the keys, Escape first.
     let free = crate::keys::takes_commands(app);
