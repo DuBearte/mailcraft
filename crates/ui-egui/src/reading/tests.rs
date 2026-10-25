@@ -131,6 +131,8 @@ fn message(n: usize, from: (&str, &str), subject: &str, html: Option<String>, te
         received: date,
         read: true,
         body: Body { text, html },
+        // On the server (mail from a file is never vouched for).
+        uid: 1,
         // The server vouched for every sender (a test of the lists would be of nothing otherwise).
         headers: vec![(
             "Authentication-Results".into(),
@@ -999,7 +1001,7 @@ fn the_reading_pane_names_nothing_that_could_fetch() {
         }
         checked += 1;
     }
-    assert_eq!(checked, 10, "reading.rs, colors, images, invitation, layout, remote, select, sharing (and its tests) and view");
+    assert_eq!(checked, 11, "reading.rs, colors, images (and its tests), invitation, layout, remote, select, sharing (and its tests) and view");
 }
 
 /// The symbols these files write as text have glyphs in the interface fonts (the check of the

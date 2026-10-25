@@ -1,4 +1,4 @@
-**MailCraft 0.8.0 in short** (an alpha for testers; sign up in [#11](https://github.com/GITHUB_REPOSITORY/issues/11))
+**MailCraft 0.8.0 in short**: the first public beta, for Microsoft accounts (testers welcome; sign up in [#11](https://github.com/GITHUB_REPOSITORY/issues/11))
 - Shared mailboxes' calendars, and a colleague's calendar opened by address ([#70](https://github.com/GITHUB_REPOSITORY/issues/70)).
 - Sender images in the message list, off unless you turn them on ([#363](https://github.com/GITHUB_REPOSITORY/issues/363)).
 - Mail, People and Tasks arranged by Categories ([#327](https://github.com/GITHUB_REPOSITORY/issues/327)).
@@ -13,6 +13,21 @@
 
 **Fixes**
 - A mail server whose certificate MailCraft can't trust is now explained in plain words ("its certificate doesn't lead back to an authority that is trusted", "its certificate has run out", "is for another name") instead of the TLS library's own text, such as "invalid peer certificate: UnknownIssuer" ([#404](https://github.com/GITHUB_REPOSITORY/issues/404)).
+- A cancellation in the mail now offers Remove from Calendar only when it comes from the meeting's organizer (or, for a meeting your mail server keeps, from that account); a calendar file you import replaces a meeting only when it names the same organizer; mail you import from a file never goes into an Outbox; replies and forwards quote what you saw in an HTML message, not the plain-text version its sender wrote beside it; address suggestions ignore Junk E-mail and a sender's future date; and "always download pictures" trusts only mail your server holds, by its `dmarc` result.
+- Links in mail and in MailCraft's own windows now go through the same check before the system opens them on Windows and macOS as on Linux, and a web address that can't be read properly, or has no host, is no longer a link.
+- A comma or semicolon in an attachment's name is replaced when it is opened or saved, so Windows can't take the rest of the name for something else to open; the name shown is the name used.
+- More kinds of file that can run or connect when opened (theme packs, server location files and a few others) are saved, never opened from a message.
+- A Microsoft sign-in is only ever presented to Microsoft's own mail servers: a mailbox file that names another server for a Microsoft account gets an error, and a stored sign-in is no longer found for an account of another kind that a file says is a shared mailbox.
+- In the browser build, links open in a new tab that has no handle on MailCraft's page, and starting from `?sample` or `?empty` no longer overwrites the mailbox kept in the browser.
+- The search box suggests as you type: keywords (`cat` gives `category:`), your categories after `category:`, and what `is:` and `has:` take ([#308](https://github.com/GITHUB_REPOSITORY/issues/308), thanks to @kartas39).
+- A keyword in quotes is now searched as text: `"is:unread"` finds those words, not unread mail ([#367](https://github.com/GITHUB_REPOSITORY/issues/367), thanks to @kartas39).
+- An agent connected through MCP is now asked before an undo or redo that would bring back or remove what the owner made: contacts, events, tasks, calendars and categories that were deleted or made, or a change to a meeting that writes to the people invited. Copying text you selected in a message is no longer something an agent can do, and an agent that saves or sends an appointment in its window is asked first, with the people it would write to named.
+- The MCP bridge (`mailcraft-cli mcp --connect`) no longer hands the control key to whatever listens on the port: the app has to prove it holds the key first.
+- A message with many large pictures declared tiny can no longer use up memory: each picture takes only the room it is shown at, the 160 MB and 64-picture limits hold for pictures on screen too, and pictures are let go after a few seconds with none shown (AU2-02).
+- A message with a picture followed by a huge run of blank spans no longer freezes the reading pane or a Send/Receive: HTML is read in time that grows with the message, not with its square (AU2-01).
+- Work started for one mailbox stays with it: a sign-in that finishes after you opened another mailbox file is thrown away instead of being filed under that mailbox's account, and a switch to Microsoft Graph that was being prepared (its copy of the mailbox) is called off when another mailbox takes the place. A mailbox waiting for its servers to be confirmed starts no switch by itself (AU2-15, AU2-16).
+- Remove MailCraft's data, and turning off remembering sign-ins, now forget every sign-in MailCraft put in the system's credential store, including those of mailboxes opened earlier (their names, never their contents, are noted in the settings), and list any that could not be removed (AU2-18).
+- A mailto: link handed to MailCraft while a message with changes is open saves that message to Drafts first, and the status bar says so (AU2-19).
 - One press of Escape or Enter no longer does two things at once. With an agent's question on screen, it only answers the question (before, it could also close the message you were writing, a dialog, File or Send/Receive Progress). With a menu open, Escape only closes the menu; with a dialog open in File, only the dialog. Holding a key down counts as one press there, and a key you were already holding when an agent's question appears doesn't answer it ([#393](https://github.com/GITHUB_REPOSITORY/issues/393), thanks to @kartas39).
 - Signing in with a password now works with mail servers that turn away the older LOGIN command: MailCraft uses the server's PLAIN sign-in when it offers one ([#375](https://github.com/GITHUB_REPOSITORY/issues/375)).
 - Escape in the search box clears the search and no longer closes a message you are writing ([#365](https://github.com/GITHUB_REPOSITORY/issues/365), thanks to @kartas39).
@@ -42,7 +57,7 @@
 - Properties… in a folder's or an account's right-click menu shows what it is, where it is and how many messages it holds; its Folder Size… button lists each folder's messages and the space they take ([#314](https://github.com/GITHUB_REPOSITORY/issues/314), thanks to @kartas39).
 - A horizontal line in a message (`<hr>`) is drawn again, in the reading pane and above the original in a reply or forward ([#349](https://github.com/GITHUB_REPOSITORY/issues/349)).
 
-**Early alpha.** The foundations are in place and tested, but much of what a daily mail program needs is not there yet, and most of the Microsoft 365 behaviour has only been tested against stand-ins. What works is in the [README](https://github.com/GITHUB_REPOSITORY#what-works-today).
+**Public beta.** For Microsoft accounts (personal, or work or school) MailCraft is a working mail, calendar and contacts program, kept in step with Outlook on the web; keep Outlook to hand while you try it, and tell us in an issue if anything is lost or out of step. Much of what a daily mail program needs is still to come, and other kinds of account are welcome but not part of the beta. What works is in the [README](https://github.com/GITHUB_REPOSITORY#what-works-today).
 
 MailCraft for Windows, macOS, Linux, FreeBSD and the web. Every file is listed with its SHA-256 in `SHA256SUMS.txt`.
 
